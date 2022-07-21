@@ -46,8 +46,10 @@ public class RoundParser {
           element.getAttributeValue("id", element.getValue().toLowerCase().replace(" ", "_"));
       String map = element.getValue();
 
-      Duration cycleCountdown = Duration.ofSeconds(20);
-      Duration startCountdown = Duration.ofSeconds(300);
+      Duration cycleCountdown =
+          Duration.ofSeconds(Long.parseLong(element.getAttributeValue("cycle", "20")));
+      Duration startCountdown =
+          Duration.ofSeconds(Long.parseLong(element.getAttributeValue("start", "120")));
 
       SingleRoundOptions options =
           new SingleRoundOptions(id, cycleCountdown, startCountdown, map, 1, true, true);
