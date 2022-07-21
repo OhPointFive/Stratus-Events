@@ -154,6 +154,7 @@ public class TournamentAdminCommands {
   public void setup(CommandSender sender, String format, @Text String teams) {
     String team1 = teams.split(",")[0];
     String team2 = teams.split(",")[1];
+    ((Player) sender).performCommand("tm unregisterall");
     ((Player) sender).performCommand("tm register " + team1);
     ((Player) sender).performCommand("tm register " + team2);
     ((Player) sender).performCommand("tm create " + format);
