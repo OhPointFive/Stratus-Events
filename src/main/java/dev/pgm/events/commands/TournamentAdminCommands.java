@@ -1,7 +1,8 @@
 package dev.pgm.events.commands;
 
-import dev.pgm.events.Tournament;
+import dev.pgm.events.EventsPlugin;
 import dev.pgm.events.TournamentManager;
+import dev.pgm.events.api.teams.TournamentTeamRegistry;
 import dev.pgm.events.team.TournamentPlayer;
 import dev.pgm.events.team.TournamentTeam;
 import dev.pgm.events.team.TournamentTeamManager;
@@ -14,47 +15,59 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.integration.Integration;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchManager;
-import tc.oc.pgm.api.player.VanishManager;
-import tc.oc.pgm.lib.app.ashcon.intake.Command;
-import tc.oc.pgm.lib.app.ashcon.intake.parametric.annotation.Text;
+import tc.oc.pgm.api.player.MatchPlayer;
+import tc.oc.pgm.lib.cloud.commandframework.annotations.Argument;
+import tc.oc.pgm.lib.cloud.commandframework.annotations.CommandDescription;
+import tc.oc.pgm.lib.cloud.commandframework.annotations.CommandMethod;
+import tc.oc.pgm.lib.cloud.commandframework.annotations.CommandPermission;
+import tc.oc.pgm.lib.cloud.commandframework.annotations.specifier.Greedy;
 
+@CommandMethod("tourney|tournament|tm|events")
 public class TournamentAdminCommands {
 
-  @Command(
-      aliases = "create",
-      desc = "Creates a tournament",
-      usage = "<format>",
-      perms = "events.staff")
+  @CommandMethod("create <format>")
+  @CommandDescription("Creates a tournament")
+  @CommandPermission("events.staff")
   public void tourney(
-      CommandSender sender, TournamentManager manager, Match match, @Text String pool) {
+      CommandSender sender,
+      TournamentManager manager,
+      Match match,
+      @Argument("format") @Greedy String pool) {
     manager.createTournament(match, MapFormatXMLParser.parse(pool));
     sender.sendMessage(ChatColor.GOLD + "Starting tournament.");
   }
 
-  @Command(aliases = "register", desc = "Register a team", usage = "<team>", perms = "events.staff")
-  public void register(CommandSender sender, TournamentTeamManager teamManager, @Text String name) {
-    TournamentTeam team = Tournament.get().getTeamRegistry().getTeam(name);
-    if (team == null) { // TODO move to provider
-      sender.sendMessage(ChatColor.RED + "Team not found!");
-      return;
-    }
+  @CommandMethod("register <team>")
+  @CommandDescription("Register a team")
+  @CommandPermission("events.staff")
+  public void register(
+      CommandSender sender,
+      TournamentTeamRegistry teamRegistry,
+      TournamentTeamManager teamManager,
+      @Argument("team") @Greedy String name) {
+    TournamentTeam team = teamRegistry.getTeam(name);
+    // TODO move to provider
+    if (team == null) throw new CommandException("Team not found!");
 
-    VanishManager vanishManager = PGM.get().getVanishManager();
     MatchManager matchManager = PGM.get().getMatchManager();
 
-    for (TournamentPlayer player : team.getPlayers())
-      if (vanishManager.isVanished(player.getUUID()))
-        vanishManager.setVanished(
-            matchManager.getPlayer(Bukkit.getPlayer(player.getUUID())), false, false);
+    for (TournamentPlayer player : team.getPlayers()) {
+      Player bukkit = Bukkit.getPlayer(player.getUUID());
+      MatchPlayer mp = matchManager.getPlayer(bukkit);
+      if (Integration.isVanished(bukkit)) Integration.setVanished(mp, false, false);
+    }
 
     teamManager.addTeam(team);
     sender.sendMessage(ChatColor.YELLOW + "Added team " + team.getName() + "!");
   }
 
-  @Command(aliases = "list", desc = "List all loaded teams", perms = "events.staff")
-  public void list(CommandSender sender) {
+  @CommandMethod("list")
+  @CommandDescription("List all loaded teams")
+  @CommandPermission("events.staff")
+  public void list(CommandSender sender, TournamentTeamRegistry registry) {
     sender.sendMessage(
         ChatColor.GOLD
             + "------- "
@@ -62,22 +75,20 @@ public class TournamentAdminCommands {
             + "Registered Teams"
             + ChatColor.GOLD
             + " -------");
-    for (TournamentTeam team : Tournament.get().getTeamRegistry().getTeams())
+    for (TournamentTeam team : EventsPlugin.get().getTeamRegistry().getTeams())
       sender.sendMessage(ChatColor.AQUA + "- " + team.getName());
     sender.sendMessage(ChatColor.YELLOW + "Run /tourney info <team> to see player roster!");
   }
 
-  @Command(
-      aliases = "info",
-      desc = "View information about a team",
-      usage = "<team",
-      perms = "events.staff")
-  public void info(CommandSender sender, @Text String name) {
-    TournamentTeam team = Tournament.get().getTeamRegistry().getTeam(name);
-    if (team == null) {
-      sender.sendMessage(ChatColor.RED + "Team not found!");
-      return;
-    }
+  @CommandMethod("info <team>")
+  @CommandDescription("View information about a team")
+  @CommandPermission("events.staff")
+  public void info(
+      CommandSender sender,
+      TournamentTeamRegistry registry,
+      @Argument("team") @Greedy String name) {
+    TournamentTeam team = registry.getTeam(name);
+    if (team == null) throw new CommandException("Team not found!");
 
     sender.sendMessage(
         ChatColor.GOLD
@@ -96,13 +107,11 @@ public class TournamentAdminCommands {
     }
   }
 
-  @Command(
-      aliases = "add",
-      desc = "Add a player to a team",
-      usage = "<uuid> <team>",
-      perms = "events.staff")
-  public void add(CommandSender sender, String uuid, @Text String name) {
-    TournamentTeam team = Tournament.get().getTeamRegistry().getTeam(name);
+  @CommandMethod("add <uuid> <team>")
+  @CommandDescription("Add a player to a team")
+  @CommandPermission("events.staff")
+  public void add(CommandSender sender, String uuid, @Argument("team") @Greedy String name) {
+    TournamentTeam team = EventsPlugin.get().getTeamRegistry().getTeam(name);
     if (team == null) {
       sender.sendMessage(ChatColor.RED + "Team not found!");
       return;
@@ -119,13 +128,11 @@ public class TournamentAdminCommands {
     team.getPlayers().add(player);
   }
 
-  @Command(
-      aliases = "remove",
-      desc = "Remove a player from a team",
-      usage = "<uuid> <team>",
-      perms = "events.staff")
-  public void remove(CommandSender sender, String uuid, @Text String name) {
-    TournamentTeam team = Tournament.get().getTeamRegistry().getTeam(name);
+  @CommandMethod("remove <uuid> <team>")
+  @CommandDescription("Remove a player to a team")
+  @CommandPermission("events.staff")
+  public void remove(CommandSender sender, String uuid, @Argument("team") @Greedy String name) {
+    TournamentTeam team = EventsPlugin.get().getTeamRegistry().getTeam(name);
     if (team == null) {
       sender.sendMessage(ChatColor.RED + "Team not found!");
       return;
@@ -144,14 +151,18 @@ public class TournamentAdminCommands {
     player.ifPresent(p -> team.getPlayers().remove(p));
   }
 
-  @Command(aliases = "unregisterall", desc = "Clear all registered teams", perms = "events.staff")
+  @CommandMethod("unregisterall")
+  @CommandDescription("Clear all registered teams")
+  @CommandPermission("events.staff")
   public void clear(CommandSender sender, TournamentTeamManager teamManager) {
     teamManager.clear();
     sender.sendMessage(ChatColor.YELLOW + "Unregistered all teams!");
   }
 
-  @Command(aliases = "setup", desc = "Sets up a tm match", perms = "events.staff")
-  public void setup(CommandSender sender, String format, @Text String teams) {
+  @CommandMethod("setup <format> <teams>")
+  @CommandDescription("Sets up a match")
+  @CommandPermission("events.staff")
+  public void setup(CommandSender sender, String format, @Argument("teams") @Greedy String teams) {
     String team1 = teams.split(",")[0];
     String team2 = teams.split(",")[1];
     ((Player) sender).performCommand("tm unregisterall");

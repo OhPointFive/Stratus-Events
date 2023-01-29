@@ -1,6 +1,6 @@
 package dev.pgm.events.format;
 
-import dev.pgm.events.Tournament;
+import dev.pgm.events.EventsPlugin;
 import dev.pgm.events.config.Context;
 import dev.pgm.events.format.events.TournamentFinishedEvent;
 import dev.pgm.events.format.rounds.RoundDescription;
@@ -100,7 +100,7 @@ public class TournamentFormatImpl implements TournamentFormat {
       onEnd(match, winner);
       // this should probably get fixed at some point!!!!
       if (!match.getMap().getName().contains("Volt"))
-        Tournament.get()
+        EventsPlugin.get()
             .getServer()
             .getPluginManager()
             .callEvent(new TournamentFinishedEvent(this, winner, loser));
@@ -164,7 +164,7 @@ public class TournamentFormatImpl implements TournamentFormat {
     FormattedScore scores = roundHolder.scores(teamManager).formattedScore(teamManager);
     Bukkit.getScheduler()
         .scheduleSyncDelayedTask(
-            Tournament.get(),
+            EventsPlugin.get(),
             new Runnable() {
 
               @Override

@@ -1,6 +1,6 @@
 package dev.pgm.events.xml;
 
-import dev.pgm.events.Tournament;
+import dev.pgm.events.EventsPlugin;
 import dev.pgm.events.format.RoundReferenceHolder;
 import dev.pgm.events.format.TournamentFormat;
 import dev.pgm.events.format.TournamentFormatImpl;
@@ -17,7 +17,7 @@ import org.jdom2.input.SAXBuilder;
 public class MapFormatXMLParser {
 
   public static TournamentFormat parse(String name) {
-    File poolsFolder = new File(Tournament.get().getDataFolder(), "formats");
+    File poolsFolder = new File(EventsPlugin.get().getDataFolder(), "formats");
     File xmlFile = new File(poolsFolder, name + ".xml");
 
     try {
@@ -39,7 +39,7 @@ public class MapFormatXMLParser {
               new BestOfCalculation<>(bestOf));
       TournamentFormat format =
           new TournamentFormatImpl(
-              Tournament.get().getTeamManager(), options, new RoundReferenceHolder());
+              EventsPlugin.get().getTeamManager(), options, new RoundReferenceHolder());
 
       if (!root.getName().toLowerCase().equals("format"))
         System.out.println(

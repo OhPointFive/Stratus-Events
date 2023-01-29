@@ -1,9 +1,10 @@
 package dev.pgm.events.listeners;
 
-import static tc.oc.pgm.lib.net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.text;
 
 import dev.pgm.events.team.TournamentTeamManager;
 import java.util.Optional;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,11 +12,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.integration.Integration;
 import tc.oc.pgm.api.player.event.MatchPlayerAddEvent;
 import tc.oc.pgm.blitz.BlitzMatchModule;
 import tc.oc.pgm.events.PlayerParticipationStartEvent;
 import tc.oc.pgm.events.PlayerParticipationStopEvent;
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor;
 import tc.oc.pgm.teams.Team;
 
 public class PlayerJoinListen implements Listener {
@@ -73,9 +74,7 @@ public class PlayerJoinListen implements Listener {
   public void vanish(PlayerJoinEvent event) {
     if (event.getPlayer().hasPermission("events.spectate.vanish")
         && !manager.playerTeam(event.getPlayer().getUniqueId()).isPresent())
-      PGM.get()
-          .getVanishManager()
-          .setVanished(PGM.get().getMatchManager().getPlayer(event.getPlayer()), true, true);
+      Integration.setVanished(PGM.get().getMatchManager().getPlayer(event.getPlayer()), true, true);
   }
 
   @EventHandler

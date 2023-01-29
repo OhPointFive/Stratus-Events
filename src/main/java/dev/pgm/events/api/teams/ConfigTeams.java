@@ -1,6 +1,8 @@
-package dev.pgm.events.team;
+package dev.pgm.events.api.teams;
 
 import dev.pgm.events.EventsPlugin;
+import dev.pgm.events.team.TournamentPlayer;
+import dev.pgm.events.team.TournamentTeam;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,17 +12,13 @@ import java.util.stream.Collectors;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class ConfigTeamParser {
+public class ConfigTeams implements TournamentTeamFetcher {
 
-  private static ConfigTeamParser instance;
-
-  private ConfigTeamParser() {
-    EventsPlugin.get()
-        .getTeamRegistry()
-        .setTeams(
-            parseTournamentTeams(
-                new File(EventsPlugin.get().getDataFolder(), "teams"),
-                new File(EventsPlugin.get().getDataFolder(), "teams.yml")));
+  @Override
+  public List<? extends TournamentTeam> getTeams() {
+    return parseTournamentTeams(
+        new File(EventsPlugin.get().getDataFolder(), "teams"),
+        new File(EventsPlugin.get().getDataFolder(), "teams.yml"));
   }
 
   private static List<TournamentTeam> parseTournamentTeams(File teamsFolder, File teamsFile) {
@@ -69,11 +67,5 @@ public class ConfigTeamParser {
     }
 
     return teamList;
-  }
-
-  public static ConfigTeamParser getInstance() {
-    if (instance == null) instance = new ConfigTeamParser();
-
-    return instance;
   }
 }
