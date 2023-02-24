@@ -1,6 +1,5 @@
 package dev.pgm.events.team;
 
-import dev.pgm.events.EventsPlugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +14,12 @@ public class ConfigTeamParser {
   private static ConfigTeamParser instance;
 
   private ConfigTeamParser() {
-    EventsPlugin.get()
-        .getTeamRegistry()
-        .setTeams(
-            parseTournamentTeams(
-                new File(EventsPlugin.get().getDataFolder(), "teams"),
-                new File(EventsPlugin.get().getDataFolder(), "teams.yml")));
+    // EventsPlugin.get()
+    //     .getTeamRegistry()
+    //     .setTeams(
+    //         parseTournamentTeams(
+    //             new File(EventsPlugin.get().getDataFolder(), "teams"),
+    //             new File(EventsPlugin.get().getDataFolder(), "teams.yml")));
   }
 
   private static List<TournamentTeam> parseTournamentTeams(File teamsFolder, File teamsFile) {

@@ -110,7 +110,8 @@ public class TournamentAdminCommands {
   @CommandMethod("add <uuid> <team>")
   @CommandDescription("Add a player to a team")
   @CommandPermission("events.staff")
-  public void add(CommandSender sender, String uuid, @Argument("team") @Greedy String name) {
+  public void add(
+      CommandSender sender, @Argument("uuid") String uuid, @Argument("team") @Greedy String name) {
     TournamentTeam team = EventsPlugin.get().getTeamRegistry().getTeam(name);
     if (team == null) {
       sender.sendMessage(ChatColor.RED + "Team not found!");
@@ -131,7 +132,8 @@ public class TournamentAdminCommands {
   @CommandMethod("remove <uuid> <team>")
   @CommandDescription("Remove a player to a team")
   @CommandPermission("events.staff")
-  public void remove(CommandSender sender, String uuid, @Argument("team") @Greedy String name) {
+  public void remove(
+      CommandSender sender, @Argument("uuid") String uuid, @Argument("team") @Greedy String name) {
     TournamentTeam team = EventsPlugin.get().getTeamRegistry().getTeam(name);
     if (team == null) {
       sender.sendMessage(ChatColor.RED + "Team not found!");
@@ -162,7 +164,10 @@ public class TournamentAdminCommands {
   @CommandMethod("setup <format> <teams>")
   @CommandDescription("Sets up a match")
   @CommandPermission("events.staff")
-  public void setup(CommandSender sender, String format, @Argument("teams") @Greedy String teams) {
+  public void setup(
+      CommandSender sender,
+      @Argument("format") String format,
+      @Argument("teams") @Greedy String teams) {
     String team1 = teams.split(",")[0];
     String team2 = teams.split(",")[1];
     ((Player) sender).performCommand("tm unregisterall");

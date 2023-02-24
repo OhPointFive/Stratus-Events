@@ -1,6 +1,6 @@
 package dev.pgm.events.ready;
 
-import static net.kyori.adventure.text.Component.text;
+import static tc.oc.pgm.lib.net.kyori.adventure.text.Component.text;
 
 import dev.pgm.events.config.AppData;
 import dev.pgm.events.utils.Parties;

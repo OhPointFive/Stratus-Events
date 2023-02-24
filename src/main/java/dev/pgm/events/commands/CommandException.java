@@ -1,10 +1,10 @@
 package dev.pgm.events.commands;
 
-import static net.kyori.adventure.text.Component.text;
+import static tc.oc.pgm.lib.net.kyori.adventure.text.Component.text;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.util.ComponentMessageThrowable;
 import org.jetbrains.annotations.Nullable;
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component;
+import tc.oc.pgm.lib.net.kyori.adventure.util.ComponentMessageThrowable;
 
 public class CommandException extends RuntimeException implements ComponentMessageThrowable {
 
